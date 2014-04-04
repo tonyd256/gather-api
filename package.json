@@ -8,5 +8,10 @@
   "dependencies": {
     "express": "3.5.1",
     "mongoose": "^3.8.8"
+  },
+  "devDependencies": {
+    "superagent": "^0.17.0",
+    "mocha": "^1.18.2",
+    "expect.js": "^0.3.1"
   }
 }

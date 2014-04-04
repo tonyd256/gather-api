@@ -2,9 +2,10 @@
 var express = require('express');
 var http = require('http');
 var path = require('path');
+var mongoose = require('mongoose');
 
-var user = require('routes/user');
-var group = require('routes/group');
+var user = require('./routes/user');
+//var group = require('./routes/group');
 
 var app = express();
 
@@ -21,15 +22,17 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.post('/user', user.create);
-app.put('/user/:id', user.update);
+app.post('/api/v1/user', user.create);
+//app.put('/api/v1/user/:id', user.update);
 
-app.get('/groups', group.read);
-app.post('/groups', group.create);
-app.put('/groups/:id/comment', group.comment);
-app.put('/groups/:id/join', group.join);
-app.put('/groups/:id/leave', group.leave);
-app.delete('/groups/:id', group.delete);
+//app.get('/api/v1/groups', group.read);
+//app.post('/api/v1/groups', group.create);
+//app.put('/api/v1/groups/:id/comment', group.comment);
+//app.put(/api/v1'/groups/:id/join', group.join);
+//app.put('/api/v1/groups/:id/leave', group.leave);
+//app.delete('/api/v1/groups/:id', group.delete);
+
+mongoose.connect('mongodb://localhost/gather', { replset: { socketOptions: { keepAlive: 1 } } });
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

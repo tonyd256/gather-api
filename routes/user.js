@@ -1,8 +1,15 @@
 
-/*
- * GET users listing.
- */
+var UserModel = require('../models/user');
 
-exports.list = function(req, res){
-  res.send("respond with a resource");
+exports.create = function (req, res, next) {
+  var user = new UserModel({
+    name: req.body.name,
+    deviceID: req.body.deviceID
+  });
+
+  user.save( function (err, user) {
+    if (err) return next(err);
+    res.send(user);
+  });
 };
+
