@@ -5,7 +5,7 @@ var path = require('path');
 var mongoose = require('mongoose');
 
 var user = require('./routes/user');
-//var group = require('./routes/group');
+var group = require('./routes/group');
 
 var app = express();
 
@@ -22,11 +22,12 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+app.get('/api/v1/user/:id', user.read);
 app.post('/api/v1/user', user.create);
-//app.put('/api/v1/user/:id', user.update);
+app.put('/api/v1/user/:id', user.update);
 
-//app.get('/api/v1/groups', group.read);
-//app.post('/api/v1/groups', group.create);
+app.get('/api/v1/groups', group.read);
+app.post('/api/v1/groups', group.create);
 //app.put('/api/v1/groups/:id/comment', group.comment);
 //app.put(/api/v1'/groups/:id/join', group.join);
 //app.put('/api/v1/groups/:id/leave', group.leave);
