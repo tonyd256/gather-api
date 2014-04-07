@@ -2,8 +2,8 @@
 var GroupModel = require('../models/group');
 
 exports.read = function (req, res, next) {
-  var options = { near: [req.body.latitude, req.body.longitude], maxDistance: req.body.radius };
-  GroupModel.geoSearch({}, options, function (err, results) {
+  var options = { spherical: true, maxDistance: Number(req.query.radius) };
+  GroupModel.geoNear([Number(req.query.latitude), Number(req.query.longitude)], options, function (err, results) {
     if (err) return next(err);
     res.send(results);
   });

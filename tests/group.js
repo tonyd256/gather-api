@@ -46,12 +46,11 @@ describe('Groups', function () {
       .set('Accept', 'application/json')
       .end(function (err, res) {
         if (err) throw err;
-console.log(user);
-console.log(res.body);
+
         expect(res).to.exist;
         expect(res.status).to.equal(200);
         expect(res.body._id).to.exist;
-        expect(res.body.owner + '').to.equal(user._id + '');
+        expect(res.body.owner).to.equal(user._id);
         expect(res.body.people).to.be.an('array');
         expect(res.body.people[0]).to.equal(user._id);
         expect(res.body.comments).to.be.an('array');
@@ -64,13 +63,14 @@ console.log(res.body);
     });
   });
 
-  describe('GET Groups', function () {
+  describe('GET', function () {
     it('should return all groups in a bounding box', function (done) {
-      request.get('http://localhost:3000/api/v1/groups?latitude=42.35843&longitude=-71.05977&radius=.5', function (res) {
+      request.get('http://localhost:3000/api/v1/groups?latitude=41.15843&longitude=-70.05977&radius=.5', function (res) {
         expect(res).to.exist;
         expect(res.status).to.equal(200);
         expect(res.body).to.be.an('array');
         expect(res.body.length).to.not.equal(0);
+        console.log(res.body);
         done();
       });
     });
