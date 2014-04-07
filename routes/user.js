@@ -1,6 +1,13 @@
 
 var UserModel = require('../models/user');
 
+exports.read = function (req, res, next) {
+  UserModel.findOne({ deviceID: req.params.id }, function (err, user) {
+    if (err) return next(err);
+    res.send(user);
+  });
+};
+
 exports.create = function (req, res, next) {
   var user = new UserModel({
     name: req.body.name,
@@ -14,9 +21,7 @@ exports.create = function (req, res, next) {
 };
 
 exports.update = function (req, res, next) {
-  UserModel.findOne(req.params.id, function (err, user) {
-    console.log(err);
-    console.log(user);
+  UserModel.findOne({ _id: req.params.id }, function (err, user) {
     if (err) return next(err);
 
     if (req.body.name) user.name = req.body.name;
