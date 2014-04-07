@@ -12,7 +12,7 @@ var groupSchema = new Schema({
   owner: { type: Schema.Types.ObjectId, ref: 'user', required: true },
   type: { type: String, required: true },
   time: { type: Date, required: true },
-  coordinate: { type: [Number], index: '2d' },
+  coordinate: { type: [Number], index: '2dsphere' },
   people: [{ type: Schema.Types.ObjectId, ref: 'user' }],
   comments: { type: [commentSchema], default: [] },
   createdAt: { type: Date, required: true, default: Date.now },

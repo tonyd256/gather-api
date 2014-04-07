@@ -28,10 +28,9 @@ app.put('/api/v1/user/:id', user.update);
 
 app.get('/api/v1/groups', group.read);
 app.post('/api/v1/groups', group.create);
-//app.put('/api/v1/groups/:id/comment', group.comment);
-//app.put(/api/v1'/groups/:id/join', group.join);
-//app.put('/api/v1/groups/:id/leave', group.leave);
-//app.delete('/api/v1/groups/:id', group.delete);
+app.post('/api/v1/groups/:id/comment', group.comment);
+app.get('/api/v1/groups/:id/join/:userID', group.join);
+app.get('/api/v1/groups/:id/leave/:userID', group.leave);
 
 mongoose.connect('mongodb://localhost/gather', { replset: { socketOptions: { keepAlive: 1 } } });
 
