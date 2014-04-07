@@ -56,9 +56,9 @@ describe('Groups', function () {
         expect(res).to.exist;
         expect(res.status).to.equal(200);
         expect(res.body._id).to.exist;
-        expect(res.body.owner).to.equal(user._id);
+        expect(res.body.owner._id).to.equal(user._id);
         expect(res.body.people).to.be.an('array');
-        expect(res.body.people[0]).to.equal(user._id);
+        expect(res.body.people[0]._id).to.equal(user._id);
         expect(res.body.comments).to.be.an('array');
         expect(res.body.coordinate).to.be.an('array');
         expect(res.body.coordinate.length).to.equal(2);
@@ -78,6 +78,7 @@ describe('Groups', function () {
         expect(res.status).to.equal(200);
         expect(res.body).to.be.an('array');
         expect(res.body.length).to.not.equal(0);
+        expect(res.body[0]._id).to.equal(group._id);
         done();
       });
     });
@@ -112,7 +113,7 @@ describe('Groups', function () {
         expect(res.body.comments).to.be.an('array');
         expect(res.body.comments.length).to.equal(1);
         expect(res.body.comments[0]._id).to.exist;
-        expect(res.body.comments[0].author).to.equal(user._id);
+        expect(res.body.comments[0].author._id).to.equal(user._id);
         expect(res.body.comments[0].comment).to.equal(comment.comment);
         done();
       });
@@ -138,7 +139,7 @@ describe('Groups', function () {
         expect(res).to.exist;
         expect(res.body.people).to.be.an('array');
         expect(res.body.people.length).to.equal(2);
-        expect(res.body.people[1]).to.equal(otherUser._id);
+        expect(res.body.people[1]._id).to.equal(otherUser._id);
         done();
       });
     });
@@ -150,7 +151,7 @@ describe('Groups', function () {
         expect(res).to.exist;
         expect(res.body.people).to.be.an('array');
         expect(res.body.people.length).to.equal(1);
-        expect(res.body.people[0]).to.equal(user._id);
+        expect(res.body.people[0]._id).to.equal(user._id);
         done();
       });
     });

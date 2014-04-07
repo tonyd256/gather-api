@@ -1,11 +1,17 @@
 
 var GroupModel = require('../models/group');
+var _ = require('underscore');
 
 exports.read = function (req, res, next) {
   var options = { spherical: true, maxDistance: Number(req.query.radius) * Math.PI / 180.0 };
   GroupModel.geoNear([Number(req.query.latitude), Number(req.query.longitude)], options, function (err, results) {
     if (err) return next(err);
-    res.send(results);
+
+    var groups = _.pluck(results, 'obj');
+    GroupModel.populate(groups, [ 'owner', 'people', 'comments.author' ], function (err, result) {
+      if (err) return next(err);
+      res.send(result);
+    });
   });
 };
 
@@ -18,9 +24,13 @@ exports.create = function (req, res, next) {
     people: [req.body.owner]
   });
 
-  group.save( function (err, result) {
+  group.save( function (err, group) {
     if (err) return next(err);
-    res.send(result);
+
+    GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
+      if (err) return next(err);
+      res.send(result);
+    });
   });
 };
 
@@ -36,7 +46,11 @@ exports.comment = function (req, res, next) {
     group.comments.push(comment);
     group.save( function (err, group) {
       if (err) return next(err);
-      res.send(group);
+
+      GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
+        if (err) return next(err);
+        res.send(result);
+      });
     });
   });
 };
@@ -49,7 +63,11 @@ exports.join = function (req, res, next) {
     group.people.push(req.params.userID);
     group.save( function (err, group) {
       if (err) return next(err);
-      res.send(group);
+
+      GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
+        if (err) return next(err);
+        res.send(result);
+      });
     });
   });
 };
@@ -70,7 +88,11 @@ exports.leave = function (req, res, next) {
 
     group.save( function (err, group) {
       if (err) return next(err);
-      res.send(group);
+
+      GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
+        if (err) return next(err);
+        res.send(result);
+      });
     });
   });
 };
