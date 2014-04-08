@@ -22,10 +22,18 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+app.use( function (err, res, req, next) {
+  if (!err) return next();
+  console.error(err.message);
+  console.error(err.stack);
+  
+  res.send(500, err.message);
+});
+
 app.get('/api/v1/user/:id', user.read);
 app.post('/api/v1/user', user.create);
 app.put('/api/v1/user/:id', user.update);
-app.get('/api/v1/user/:id/register/:deviceID', user.register);
+app.post('/api/v1/user/:id/register', user.register);
 
 app.get('/api/v1/groups', group.read);
 app.post('/api/v1/groups', group.create);

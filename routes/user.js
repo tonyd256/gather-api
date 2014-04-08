@@ -1,6 +1,7 @@
 
 var UserModel = require('../models/user');
-var sns = new require('aws-sdk').SNS({ apiVersion: '2010-03-31' });
+var AWS = require('aws-sdk');
+var sns = new AWS.SNS({ apiVersion: '2010-03-31' });
 
 exports.read = function (req, res, next) {
   UserModel.findOne({ deviceID: req.params.id }, function (err, user) {
@@ -43,7 +44,7 @@ exports.register = function (req, res, next) {
 
     var params = {
       PlatformApplicationArn: process.env['SNS_APPLICATION_ARN'],
-      Token: req.params.deviceID
+      Token: req.body.deviceToken
     };
 
     sns.createPlatformEndpoint(params, function (err, data) {
