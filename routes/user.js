@@ -1,5 +1,6 @@
 
 var UserModel = require('../models/user');
+var sns = new require('aws-sdk').SNS({ apiVersion: '2010-03-31' });
 
 exports.read = function (req, res, next) {
   UserModel.findOne({ deviceID: req.params.id }, function (err, user) {
@@ -21,7 +22,7 @@ exports.create = function (req, res, next) {
 };
 
 exports.update = function (req, res, next) {
-  UserModel.findOne({ _id: req.params.id }, function (err, user) {
+  UserModel.findById(req.params.id, function (err, user) {
     if (err) return next(err);
 
     if (req.body.name) user.name = req.body.name;
@@ -35,3 +36,25 @@ exports.update = function (req, res, next) {
     });
   });
 };
+
+exports.register = function (req, res, next) {
+  UserModel.findById(req.params.id, function (err, user) {
+    if (err) return next(err);
+
+    var params = {
+      PlatformApplicationArn: process.env['SNS_APPLICATION_ARN'],
+      Token: req.params.deviceID
+    };
+
+    sns.createPlatformEndpoint(params, function (err, data) {
+      if (err) return next(err);
+
+      user.pushID = data.EndpointArn;
+      user.save( function (err, result) {
+        if (err) return next(err);
+        res.send();
+      });
+    });
+  });
+};
+
