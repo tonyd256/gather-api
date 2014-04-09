@@ -30,21 +30,34 @@ exports.create = function (req, res, next) {
   group.save( function (err, group) {
     if (err) return next(err);
 
-    sns.createTopic({ Name: group.id }, function (err, data) {
-      if (err) console.log(err);
-
-      group.topicID = data.TopicArn || '';
-      group.save( function (err, group) {
-        if (err) return next(err);
-
-        GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
-          if (err) return next(err);
-          res.send(result);
-        });
-      });
+    GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
+      if (err) return next(err);
+      res.send(result);
+      createTopic(group);
     });
   });
 };
+
+function createTopic(group) {
+  sns.createTopic({ Name: group.id }, function (err, data) {
+    if (err) return console.log(err);
+
+    group.topicID = data.TopicArn || '';
+    group.save( function (err, group) {
+      if (err) return console.log(err);
+
+      var params = {
+        Protocol: 'application',
+        TopicArn: group.topicID,
+        Endpoint: group.owner.pushID
+      };
+
+      sns.subscribe(params, function (err, data) {
+        if (err) return console.log(err);
+      });
+    });
+  });
+}
 
 exports.comment = function (req, res, next) {
   var comment = {
