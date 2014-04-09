@@ -1,4 +1,11 @@
 
+if (process.env.NODETIME_ACCOUNT_KEY) {
+    require('nodetime').profile({
+          accountKey: process.env.NODETIME_ACCOUNT_KEY,
+          appName: 'Gather'
+        });
+}
+
 var express = require('express');
 var http = require('http');
 var path = require('path');
@@ -41,7 +48,7 @@ app.post('/api/v1/groups/:id/comment', group.comment);
 app.get('/api/v1/groups/:id/join/:userID', group.join);
 app.get('/api/v1/groups/:id/leave/:userID', group.leave);
 
-mongoose.connect(process.env['MONGOLAB_URI'] || 'mongodb://localhost/gather', { replset: { socketOptions: { keepAlive: 1 } } });
+mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/gather', { replset: { socketOptions: { keepAlive: 1 } } });
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
