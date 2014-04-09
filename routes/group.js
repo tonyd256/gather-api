@@ -1,6 +1,9 @@
 
 var GroupModel = require('../models/group');
 var _ = require('underscore');
+var AWS = require('aws-sdk');
+AWS.config.region = 'us-east-1';
+var sns = new AWS.SNS({ apiVersion: '2010-03-31' });
 
 exports.read = function (req, res, next) {
   var options = { spherical: true, maxDistance: Number(req.query.radius) * Math.PI / 180.0 };
@@ -27,9 +30,18 @@ exports.create = function (req, res, next) {
   group.save( function (err, group) {
     if (err) return next(err);
 
-    GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
-      if (err) return next(err);
-      res.send(result);
+    sns.createTopic({ name: group.id }, function (err, data) {
+      if (err) console.log(err);
+
+      group.topicID = data.TopicArn || '';
+      group.save( function (err, group) {
+        if (err) return next(err);
+
+        GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
+          if (err) return next(err);
+          res.send(result);
+        });
+      });
     });
   });
 };

@@ -15,6 +15,7 @@ var groupSchema = new Schema({
   coordinate: { type: [Number], index: '2dsphere' },
   people: [{ type: Schema.Types.ObjectId, ref: 'user' }],
   comments: { type: [commentSchema], default: [] },
+  topicID: String,
   createdAt: { type: Date, required: true, default: Date.now },
   updatedAt: { type: Date, required: true, default: Date.now }
 }, { safe: true });
