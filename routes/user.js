@@ -29,7 +29,6 @@ exports.update = function (req, res, next) {
 
     if (req.body.name) user.name = req.body.name;
     if (req.body.pushEnabled !== undefined) user.pushEnabled = req.body.pushEnabled;
-    if (req.body.pushID) user.pushID = req.body.pushID;
     user.updatedAt = Date.now();
 
     user.save( function (err, result) {
@@ -51,7 +50,10 @@ exports.register = function (req, res, next) {
     sns.createPlatformEndpoint(params, function (err, data) {
       if (err) return next(err);
 
+      user.pushEnabled = true;
       user.pushID = data.EndpointArn;
+      user.updatedAt = Date.now();
+
       user.save( function (err, result) {
         if (err) return next(err);
         res.send();
