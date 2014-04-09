@@ -1,6 +1,7 @@
 
 var UserModel = require('../models/user');
 var AWS = require('aws-sdk');
+AWS.config.region = 'us-east-1';
 var sns = new AWS.SNS({ apiVersion: '2010-03-31' });
 
 exports.read = function (req, res, next) {
