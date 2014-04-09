@@ -30,7 +30,7 @@ exports.create = function (req, res, next) {
   group.save( function (err, group) {
     if (err) return next(err);
 
-    sns.createTopic({ name: group.id }, function (err, data) {
+    sns.createTopic({ Name: group.id }, function (err, data) {
       if (err) console.log(err);
 
       group.topicID = data.TopicArn || '';
