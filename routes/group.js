@@ -1,9 +1,7 @@
 
 var GroupModel = require('../models/group');
 var _ = require('underscore');
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1';
-var sns = new AWS.SNS({ apiVersion: '2010-03-31' });
+var push = require('../controllers/push');
 
 exports.read = function (req, res, next) {
   var options = { spherical: true, maxDistance: Number(req.query.radius) * Math.PI / 180.0 };
@@ -33,31 +31,19 @@ exports.create = function (req, res, next) {
     GroupModel.populate(group, [ 'owner', 'people' ], function (err, result) {
       if (err) return next(err);
       res.send(result);
-      createTopic(group);
-    });
-  });
-};
 
-function createTopic(group) {
-  sns.createTopic({ Name: group.id }, function (err, data) {
-    if (err) return console.log(err);
+      push.createTopic(group.id, function (topicID) {
+        if (!topicID) return;
 
-    group.topicID = data.TopicArn || '';
-    group.save( function (err, group) {
-      if (err) return console.log(err);
-
-      var params = {
-        Protocol: 'application',
-        TopicArn: group.topicID,
-        Endpoint: group.owner.pushID
-      };
-
-      sns.subscribe(params, function (err, data) {
-        if (err) return console.log(err);
+        group.topicID = topicID;
+        group.save( function (err, group) {
+          if (err) return console.error(err);
+          push.subscribe(group.topicID, group.owner.pushID);
+        });
       });
     });
   });
-}
+};
 
 exports.comment = function (req, res, next) {
   var comment = {
@@ -75,6 +61,11 @@ exports.comment = function (req, res, next) {
       GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
         if (err) return next(err);
         res.send(result);
+
+        var comment = group.comments[group.comments.length - 1];
+        var message = comment.author.name + ' says: ' + comment.comment.substr(0, 100);
+        if (comment.comment.length > 100) message += '...';
+        push.pushMessage(group.topicID, message);
       });
     });
   });
@@ -92,6 +83,9 @@ exports.join = function (req, res, next) {
       GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
         if (err) return next(err);
         res.send(result);
+
+        var user = _.findWhere(group.people, { _id: req.params.userID });
+        push.subscribe(group.topicID, user.id);
       });
     });
   });
@@ -107,6 +101,8 @@ exports.leave = function (req, res, next) {
       group.remove( function (err) {
         if (err) return next(err);
         res.send({});
+
+        push.deleteTopic(group.tokenID);
       });
       return;
     }
@@ -117,6 +113,9 @@ exports.leave = function (req, res, next) {
       GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
         if (err) return next(err);
         res.send(result);
+
+        var user = _.findWhere(group.people, { _id: req.params.userID });
+        push.unsubscribe(group.topicID, user.id);
       });
     });
   });

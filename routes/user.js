@@ -1,8 +1,6 @@
 
 var UserModel = require('../models/user');
-var AWS = require('aws-sdk');
-AWS.config.region = 'us-east-1';
-var sns = new AWS.SNS({ apiVersion: '2010-03-31' });
+var push = require('../controllers/push');
 
 exports.read = function (req, res, next) {
   UserModel.findOne({ deviceID: req.params.id }, function (err, user) {
@@ -42,16 +40,11 @@ exports.register = function (req, res, next) {
   UserModel.findById(req.params.id, function (err, user) {
     if (err) return next(err);
 
-    var params = {
-      PlatformApplicationArn: process.env['SNS_APPLICATION_ARN'],
-      Token: req.body.deviceToken
-    };
-
-    sns.createPlatformEndpoint(params, function (err, data) {
+    push.createEndpoint(res.body.deviceToken, function (err, pushID) {
       if (err) return next(err);
 
       user.pushEnabled = true;
-      user.pushID = data.EndpointArn;
+      user.pushID = pushID;
       user.updatedAt = Date.now();
 
       user.save( function (err, result) {
