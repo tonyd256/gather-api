@@ -85,6 +85,8 @@ exports.join = function (req, res, next) {
         res.send(result);
 
         var user = _.findWhere(result.people, { _id: req.params.userID });
+        var message = user.name + ' joined your group!';
+        push.pushMessage(result.topicID, message);
         push.subscribe(result.topicID, user.id);
       });
     });
