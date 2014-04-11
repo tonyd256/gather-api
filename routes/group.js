@@ -84,8 +84,8 @@ exports.join = function (req, res, next) {
         if (err) return next(err);
         res.send(result);
 
-        var user = _.findWhere(group.people, { _id: req.params.userID });
-        push.subscribe(group.topicID, user.id);
+        var user = _.findWhere(result.people, { _id: req.params.userID });
+        push.subscribe(result.topicID, user.id);
       });
     });
   });
