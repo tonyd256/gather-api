@@ -98,11 +98,10 @@ exports.leave = function (req, res, next) {
     group.people.remove(req.params.userID);
 
     if (group.people.length === 0) {
+      push.deleteTopic(group.topicID);
       group.remove( function (err) {
         if (err) return next(err);
         res.send({});
-
-        push.deleteTopic(group.tokenID);
       });
       return;
     }
