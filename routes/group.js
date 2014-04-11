@@ -83,7 +83,7 @@ exports.join = function (req, res, next) {
       GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
         if (err) return next(err);
         res.send(result);
-
+console.log(result.people);
         var user = _.findWhere(result.people, { _id: req.params.userID });
         var message = user.name + ' joined your group!';
         push.pushMessage(result.topicID, message);
