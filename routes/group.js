@@ -83,12 +83,12 @@ exports.join = function (req, res, next) {
       GroupModel.populate(group, [ 'owner', 'people', 'comments.author' ], function (err, result) {
         if (err) return next(err);
         res.send(result);
-console.log(result.people);
-console.log(req.params.userID);
+
+        result = JSON.parse(JSON.stringify(result));
         var user = _.findWhere(result.people, { _id: req.params.userID });
         var message = user.name + ' joined your group!';
         push.pushMessage(result.topicID, message);
-        push.subscribe(result.topicID, user.id);
+        push.subscribe(result.topicID, user.pushID);
       });
     });
   });
@@ -116,8 +116,9 @@ exports.leave = function (req, res, next) {
         if (err) return next(err);
         res.send(result);
 
-        var user = _.findWhere(group.people, { _id: req.params.userID });
-        push.unsubscribe(group.topicID, user.id);
+        result = JSON.parse(JSON.stringify(result));
+        var user = _.findWhere(result.people, { _id: req.params.userID });
+        push.unsubscribe(result.topicID, user.pushID);
       });
     });
   });
